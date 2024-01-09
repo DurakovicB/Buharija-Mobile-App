@@ -14,6 +14,10 @@ class HadithRepository(private val context: Context) {
         return chapters.map { it.name }
     }
 
+    fun getChapterName(id:Int):String{
+        return chapters.get(id).name
+    }
+
     private fun loadHadiths(): List<Chapter> {
         val loadedChapters = mutableListOf<Chapter>()
 

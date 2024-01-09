@@ -55,8 +55,8 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     startDestination = "home",
                             modifier = Modifier
-                            .padding(innerPadding)
-                        .fillMaxSize()
+                                .padding(innerPadding)
+                                .fillMaxSize()
                 ) {
                     composable("home") {
                         // Your home screen content
@@ -67,7 +67,8 @@ class MainActivity : ComponentActivity() {
                         // Extract the chapterId from the route
                         val chapterId = backStackEntry.arguments?.getString("chapterId")
                         val hadiths = hadithRepository.getHadithsForChapter(chapterId!!.toInt())
-                        HadithList(hadiths = hadiths)
+                        val chapterName= hadithRepository.getChapterName(chapterId!!.toInt())
+                        HadithList(hadiths = hadiths, chapterName = chapterName)
                     }
                 }
 
