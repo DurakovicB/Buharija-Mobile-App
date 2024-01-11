@@ -1,10 +1,14 @@
 package com.example.buharija
 
 import Homepage
+import SearchMenu
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,25 +34,26 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
             val hadithRepository = HadithRepository(LocalContext.current)
-            val chapterNames: List<String> = hadithRepository.getChapterNames()
             Scaffold(
                 topBar = {
                     // TopAppBar remains the same
                 },
                 bottomBar = {
-                    CustomBottomBar()
+                    CustomBottomBar(navController)
                 }
             ) { innerPadding ->
                 NavHost(
@@ -61,15 +66,24 @@ class MainActivity : ComponentActivity() {
                     composable("home") {
                         // Your home screen content
                         // You can include buttons or other UI elements to trigger navigation
-                        Homepage(navController = navController, chapters = chapterNames)
+                        Homepage(navController = navController, chapters = hadithRepository.getChapters())
                     }
                     composable("hadith_list/{chapterId}") { backStackEntry ->
                         // Extract the chapterId from the route
-                        val chapterId = backStackEntry.arguments?.getString("chapterId")
-                        val hadiths = hadithRepository.getHadithsForChapter(chapterId!!.toInt())
-                        val chapterName= hadithRepository.getChapterName(chapterId!!.toInt())
-                        HadithList(hadiths = hadiths, chapterName = chapterName)
+                        val chapterId = backStackEntry.arguments?.getString("chapterId")!!.toInt()
+                        val chapterName=hadithRepository.getChapterById(chapterId)?.name
+                        val hadiths= hadithRepository.getHadithsForChapter(chapterId = chapterId)
+                        if(chapterName != null) HadithList(hadiths = hadiths, chapterName = chapterName)
                     }
+                    composable("searchMenu"){
+                        SearchMenu(navController=navController)
+                    }
+                    composable("exactsearch/{search_term}"){}
+                    composable("exactsearch/{search_term}"){}
+                    composable("dailyhadith"){}
+                    composable("bookmarks"){}
+
+
                 }
 
             }
@@ -77,7 +91,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 @Composable
-fun CustomBottomBar() {
+fun CustomBottomBar(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -86,18 +100,23 @@ fun CustomBottomBar() {
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BottomBarItem(icon = Icons.Default.Add, label = "Read")
-        BottomBarItem(icon = Icons.Default.Search, label = "Search")
-        BottomBarItem(icon = Icons.Default.AccountCircle, label = "Bookmarks")
-        BottomBarItem(icon = Icons.Default.Call, label = "Daily Hadith")
+        BottomBarItem(navController=navController,route="homepage", icon = Icons.Default.Add, label = "Read")
+        BottomBarItem(navController=navController,route="searchMenu", icon = Icons.Default.Search, label = "Search")
+        BottomBarItem(navController=navController,route="bookmarks", icon = Icons.Default.AccountCircle, label = "Bookmarks")
+        BottomBarItem(navController=navController,route="dailyhadith", icon = Icons.Default.Call, label = "Daily Hadith")
     }
 }
 
 @Composable
-fun BottomBarItem(icon: ImageVector, label: String) {
+fun BottomBarItem(navController:NavController,route:String,icon: ImageVector, label: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+        .clickable {
+            // Navigate to HadithList screen when a chapter is clicked
+            navController.navigate("$route")
+        }
     ) {
         Icon(
             imageVector = icon,

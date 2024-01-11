@@ -1,6 +1,9 @@
 package com.example.buharija
 
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,58 +18,65 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HadithList(chapterName: String, hadiths: List<String>) {
+fun ChapterList(chapters: List<Chapter>, navController: NavController) {
+    val firstName = chapters[0].name
+    // Assuming you are using Android's Log class
+    Log.d("YourTag", "First Name: $firstName ")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         TopAppBar(
             title = {
-                val fontSize: TextUnit
-                if((chapterName.length>40)and(chapterName.length<65)) fontSize=17.sp
-                else if(chapterName.length<40) fontSize=24.sp
-                else fontSize=15.sp
                 Text(
-                    text = chapterName,
+                    text = "Poglavlja",
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    fontSize = fontSize
+                    modifier = Modifier.padding(8.dp)
                 )
-            },
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
+
+
+            }
+
+
         )
+
+
 
         Spacer(modifier = Modifier.height(8.dp)) // Adjust the height as needed
 
         LazyColumn {
-            itemsIndexed(hadiths) { index, hadith ->
-                Text(
-                    text = hadith,
-                    style = MaterialTheme.typography.bodyMedium,
+            itemsIndexed(chapters) { index, chapter ->
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                        .clickable {
+                            // Navigate to HadithList screen when a chapter is clicked
+                            navController.navigate("hadith_list/$index")
+                        }
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = chapter.name,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
             }
         }
     }
+
 }
 
 
+@Preview(showBackground = true)
+@Composable
+fun ChapterListPreview(){
 
-
-
-
+}
