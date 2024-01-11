@@ -2,24 +2,52 @@ package com.example.buharija
 
 import android.content.Context
 
+data class Hadith(val id: Int, val text: String)
+
+data class Chapter(val id: Int, val name: String, val startHadithId: Int, var endHadithId: Int)
+
 class HadithRepository(private val context: Context) {
-    // Initialize chapters when the class is created
-    private val chapters: List<Chapter> = loadHadiths()
+    private val hadiths: MutableList<Hadith> = mutableListOf()
+    private val chapters: List<Chapter> = loadChapters()
 
-    fun getHadithsForChapter(index: Int): List<String> {
-        return chapters.getOrNull(index)!!.hadiths
+    fun getChapters(): List<Chapter> {
+        return this.chapters
     }
 
-    fun getChapterNames(): List<String> {
-        return chapters.map { it.name }
+    fun getChapterById(id: Int): Chapter? {
+        return chapters.firstOrNull { it.id == id }
     }
 
-    fun getChapterName(id:Int):String{
-        return chapters.get(id).name
+    fun getAllHadiths(): List<Hadith> {
+        return hadiths
     }
 
-    private fun loadHadiths(): List<Chapter> {
+    fun getHadithsForChapter(chapterId: Int): List<Hadith> {
+        val chapter = chapters.firstOrNull { it.id == chapterId }
+        return chapter?.let { hadiths.subList(it.startHadithId - 1, it.endHadithId) } ?: emptyList()
+    }
+
+    fun getHadithById(hadithId: Int): Hadith? {
+        return hadiths.firstOrNull { it.id == hadithId }
+    }
+
+    // Function to search for an exact phrase in hadiths
+    fun searchExactPhrase(query: String): List<Hadith> {
+        return hadiths.filter { hadith ->
+            hadith.text.contains(query, ignoreCase = true)
+        }
+    }
+
+    // Function to search for keywords in hadiths
+    fun searchKeywords(keywords: List<String>): List<Hadith> {
+        return hadiths.filter { hadith ->
+            keywords.any { keyword -> hadith.text.contains(keyword, ignoreCase = true) }
+        }
+    }
+
+    private fun loadChapters(): List<Chapter> {
         val loadedChapters = mutableListOf<Chapter>()
+        var hadithIdCounter = 1 // Counter for unique hadith IDs
 
         // Read the text file from the raw resources
         val inputStream = context.resources.openRawResource(R.raw.hadiths)
@@ -34,22 +62,25 @@ class HadithRepository(private val context: Context) {
             // Check if the line is a chapter name
             if (trimmedLine == trimmedLine.uppercase()) {
                 isChapterName = true
-                currentChapter = Chapter(trimmedLine, mutableListOf())
-                loadedChapters.add(currentChapter)
+                currentChapter?.let { loadedChapters.add(it) } // Add previous chapter
+                currentChapter = Chapter(
+                    loadedChapters.size ,
+                    trimmedLine,
+                    hadithIdCounter,
+                    hadithIdCounter
+                )
             } else if (isChapterName && !trimmedLine.isEmpty() && currentChapter != null) {
                 // If in a chapter and the line is not empty, add it to the current chapter's hadiths
-                currentChapter.hadiths.add(trimmedLine)
+                hadiths.add(Hadith(hadithIdCounter++, trimmedLine))
+                currentChapter.endHadithId = hadithIdCounter-1 // Update endHadithId
             } else if (isChapterName && trimmedLine.isEmpty()) {
                 // If an empty line is encountered after a chapter name, consider it as a separator
                 isChapterName = false
             }
         }
 
+        currentChapter?.let { loadedChapters.add(it) } // Add the last chapter
+
         return loadedChapters
     }
-
-
-
 }
-
-data class Chapter(val name: String, val hadiths: MutableList<String>)
