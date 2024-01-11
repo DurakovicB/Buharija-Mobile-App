@@ -1,9 +1,12 @@
 package com.example.buharija
 
+import DailyHadith
 import Homepage
 import SearchMenu
+import SearchResults
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -17,9 +20,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -78,9 +80,21 @@ class MainActivity : ComponentActivity() {
                     composable("searchMenu"){
                         SearchMenu(navController=navController)
                     }
-                    composable("exactsearch/{search_term}"){}
-                    composable("exactsearch/{search_term}"){}
-                    composable("dailyhadith"){}
+                    composable("exactsearch/{searchTerm}"){backStackEntry->
+                        val phrase = backStackEntry.arguments?.getString("searchTerm")!!
+                        Log.d("exactsearch", "$phrase")
+                        SearchResults(hadiths = hadithRepository.searchExactPhrase(phrase), phrase)
+                    }
+                    composable("keywordsearch/{searchTerm}"){backStackEntry->
+                        val phrase = backStackEntry.arguments?.getString("searchTerm")!!
+                        Log.d("exactsearch", "$phrase")
+
+
+                        SearchResults(hadiths = hadithRepository.searchKeywords(phrase), phrase)
+                    }
+                    composable("dailyhadith"){
+                        DailyHadith(hadithRepository.randomHadith()!!)
+                    }
                     composable("bookmarks"){}
 
 
@@ -100,10 +114,10 @@ fun CustomBottomBar(navController: NavController) {
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BottomBarItem(navController=navController,route="homepage", icon = Icons.Default.Add, label = "Read")
-        BottomBarItem(navController=navController,route="searchMenu", icon = Icons.Default.Search, label = "Search")
-        BottomBarItem(navController=navController,route="bookmarks", icon = Icons.Default.AccountCircle, label = "Bookmarks")
-        BottomBarItem(navController=navController,route="dailyhadith", icon = Icons.Default.Call, label = "Daily Hadith")
+        BottomBarItem(navController=navController,route="home", icon = Icons.Default.Home, label = "Čitaj")
+        BottomBarItem(navController=navController,route="searchMenu", icon = Icons.Default.Search, label = "Traži")
+        BottomBarItem(navController=navController,route="bookmarks", icon = Icons.Default.FavoriteBorder, label = "Oznake")
+        BottomBarItem(navController=navController,route="dailyhadith", icon = Icons.Default.DateRange, label = "Hadis Dana")
     }
 }
 
@@ -115,6 +129,7 @@ fun BottomBarItem(navController:NavController,route:String,icon: ImageVector, la
         modifier = Modifier
         .clickable {
             // Navigate to HadithList screen when a chapter is clicked
+            Log.d("mainact","clickable")
             navController.navigate("$route")
         }
     ) {
@@ -132,9 +147,4 @@ fun BottomBarItem(navController:NavController,route:String,icon: ImageVector, la
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun BuharijaPreview() {
-
-}
 

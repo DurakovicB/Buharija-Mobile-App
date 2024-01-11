@@ -1,7 +1,6 @@
 package com.example.buharija
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,10 +25,6 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterList(chapters: List<Chapter>, navController: NavController) {
-    val firstName = chapters[0].name
-    // Assuming you are using Android's Log class
-    Log.d("YourTag", "First Name: $firstName ")
-
     Column(
         modifier = Modifier
             .fillMaxSize()

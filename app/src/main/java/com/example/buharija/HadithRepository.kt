@@ -18,10 +18,6 @@ class HadithRepository(private val context: Context) {
         return chapters.firstOrNull { it.id == id }
     }
 
-    fun getAllHadiths(): List<Hadith> {
-        return hadiths
-    }
-
     fun getHadithsForChapter(chapterId: Int): List<Hadith> {
         val chapter = chapters.firstOrNull { it.id == chapterId }
         return chapter?.let { hadiths.subList(it.startHadithId - 1, it.endHadithId) } ?: emptyList()
@@ -32,17 +28,23 @@ class HadithRepository(private val context: Context) {
     }
 
     // Function to search for an exact phrase in hadiths
-    fun searchExactPhrase(query: String): List<Hadith> {
+    fun searchExactPhrase(phrase: String): List<Hadith> {
         return hadiths.filter { hadith ->
-            hadith.text.contains(query, ignoreCase = true)
+            hadith.text.contains(phrase, ignoreCase = true)
         }
     }
 
     // Function to search for keywords in hadiths
-    fun searchKeywords(keywords: List<String>): List<Hadith> {
+    fun searchKeywords(phrase: String): List<Hadith> {
+        val keywords = phrase.split("\\s+".toRegex()) // Split input string by whitespace
         return hadiths.filter { hadith ->
             keywords.any { keyword -> hadith.text.contains(keyword, ignoreCase = true) }
         }
+    }
+
+
+    fun randomHadith(): Hadith? {
+        return hadiths.randomOrNull()
     }
 
     private fun loadChapters(): List<Chapter> {
