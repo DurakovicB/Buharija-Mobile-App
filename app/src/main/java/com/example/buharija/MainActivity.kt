@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity() {
                         SearchResults(hadiths = hadithRepository.searchKeywords(phrase), phrase)
                     }
                     composable("dailyhadith"){
-                        DailyHadith(hadithRepository.randomHadith()!!)
+                        DailyHadith(navController,hadithRepository.randomHadith()!!)
                     }
                     composable("bookmarks"){}
 

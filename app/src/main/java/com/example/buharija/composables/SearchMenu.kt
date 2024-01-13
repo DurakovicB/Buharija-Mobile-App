@@ -1,6 +1,5 @@
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,7 +56,7 @@ fun SearchMenu( navController: NavController) {
 
         if (searchTerm.isBlank()) {
             Text(
-                text = "Polje ne može biti prazno",
+                text = "Polje ne može biti prazno!",
                 color = Color.Red,
                 modifier = Modifier.padding(top = 4.dp)
             )
@@ -81,7 +80,6 @@ fun SearchMenu( navController: NavController) {
         Button(
 
             onClick = {
-                Log.d("SEARCHMENU", "$searchTerm, $exactPhrase")
                 //hideKeyboard()
 
                 if (searchTerm.isBlank()) {
@@ -95,7 +93,7 @@ fun SearchMenu( navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Text("Search")
+            Text("Traži")
         }
     }
 }
