@@ -6,9 +6,40 @@ data class Hadith(val id: Int, val text: String)
 
 data class Chapter(val id: Int, val name: String, val startHadithId: Int, var endHadithId: Int)
 
+data class Tag(val name: String, val hadithIds: List<Int>)
+
 class HadithRepository(private val context: Context) {
     private val hadiths: MutableList<Hadith> = mutableListOf()
     private val chapters: List<Chapter> = loadChapters()
+
+    private val defaultTag = Tag(name = "Favourite", hadithIds = mutableListOf(2,3,4,5,22))
+
+    private val tags: MutableList<Tag> = mutableListOf(defaultTag)
+
+    // Function to add a tag
+    fun addTag(tag: Tag) {
+        tags.add(tag)
+    }
+
+    // Function to add a bookmark to a tag
+    fun addHadithToTag(tagName: String, hadithId: Int) {
+        val existingTag = tags.find { it.name == tagName }
+        if (existingTag != null) {
+            val updatedHadithIds = existingTag.hadithIds.toMutableList()
+            updatedHadithIds.add(hadithId)
+            val updatedTag = existingTag.copy(hadithIds = updatedHadithIds)
+            tags.remove(existingTag)
+            tags.add(updatedTag)
+        } else {
+            val newTag = Tag(tagName, listOf(hadithId))
+            tags.add(newTag)
+        }
+    }
+
+    // Function to get tags
+    fun getTags(): List<Tag> {
+        return tags
+    }
 
     fun getChapters(): List<Chapter> {
         return this.chapters

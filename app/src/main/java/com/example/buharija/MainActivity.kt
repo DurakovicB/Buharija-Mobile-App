@@ -4,6 +4,7 @@ import DailyHadith
 import Homepage
 import SearchMenu
 import SearchResults
+import TagList
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -82,12 +83,10 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("exactsearch/{searchTerm}"){backStackEntry->
                         val phrase = backStackEntry.arguments?.getString("searchTerm")!!
-                        Log.d("exactsearch", "$phrase")
                         SearchResults(hadiths = hadithRepository.searchExactPhrase(phrase), phrase)
                     }
                     composable("keywordsearch/{searchTerm}"){backStackEntry->
                         val phrase = backStackEntry.arguments?.getString("searchTerm")!!
-                        Log.d("exactsearch", "$phrase")
 
 
                         SearchResults(hadiths = hadithRepository.searchKeywords(phrase), phrase)
@@ -95,8 +94,19 @@ class MainActivity : ComponentActivity() {
                     composable("dailyhadith"){
                         DailyHadith(navController,hadithRepository.randomHadith()!!)
                     }
-                    composable("bookmarks"){}
+                    composable("bookmarks"){
+                        val tags= hadithRepository.getTags()
+                     TagList(navController, tags)
+                    }
+                    composable("bookmarks/{tag_name}/{hadithIds}") { backStackEntry ->
+                        val hadithIds = backStackEntry.arguments?.getString("hadithIds")?.split(",").orEmpty().map { it.toInt() }
+                        val tagName=backStackEntry.arguments?.getString("tag_name")
+                        val bookmarkedHadiths = hadithIds.mapNotNull { hadithId ->
+                            hadithRepository.getHadithById(hadithId)
+                        }
 
+                        HadithList(chapterName = tagName!!,hadiths = bookmarkedHadiths)
+                    }
 
                 }
 

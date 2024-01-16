@@ -54,7 +54,7 @@ fun SearchMenu( navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        if (searchTerm.isBlank()) {
+        if (searchTerm=="") {
             Text(
                 text = "Polje ne može biti prazno!",
                 color = Color.Red,
