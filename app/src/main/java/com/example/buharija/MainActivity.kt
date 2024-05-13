@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("bookmarks"){
                         val tags= hadithRepository.getTags()
-                     TagList(navController, tags)
+                     TagList(navController, tags,hadithRepository)
                     }
                     composable("bookmarks/{tag_name}/{hadithIds}") { backStackEntry ->
                         val hadithIds = backStackEntry.arguments?.getString("hadithIds")?.split(",").orEmpty().map { it.toInt() }

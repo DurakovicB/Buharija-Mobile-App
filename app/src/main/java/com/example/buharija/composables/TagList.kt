@@ -21,11 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.buharija.HadithRepository
 import com.example.buharija.Tag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TagList(navController: NavController, tags: List<Tag>) {
+fun TagList(navController: NavController, tags: List<Tag>, hadithRepository: HadithRepository) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,7 +87,7 @@ fun TagList(navController: NavController, tags: List<Tag>) {
         ) {
             Button(
                 onClick = {
-                    // Handle button click
+                    hadithRepository.addEmptyTag()
                 }
             ) {
                 Text(text = "Add Tag")

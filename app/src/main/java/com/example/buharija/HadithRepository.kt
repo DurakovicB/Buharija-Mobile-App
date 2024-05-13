@@ -17,8 +17,8 @@ class HadithRepository(private val context: Context) {
     private val tags: MutableList<Tag> = mutableListOf(defaultTag)
 
     // Function to add a tag
-    fun addTag(tag: Tag) {
-        tags.add(tag)
+    fun addEmptyTag() {
+        tags.add(Tag(name="New Tag", hadithIds = mutableListOf()))
     }
 
     // Function to add a bookmark to a tag
